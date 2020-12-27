@@ -5,11 +5,8 @@ const scrap = require("./scraper");
 
 
 const init = async () => {
-  const server = Hapi.server({
-    port: 5000,
-    host: "secure-gorge-91750.herokuapp.com"
-  });
-
+  var server = new Hapi.Server(+process.env.PORT, '0.0.0.0');
+  
   server.route({
     method: "GET",
     path: "/posts",
@@ -19,6 +16,14 @@ const init = async () => {
       
     }
   });
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: (request, h) => {
+
+        return 'Hello World!';
+    }
+});
 
   await server.start();
   console.log("Server running on %s", server.info.uri);
