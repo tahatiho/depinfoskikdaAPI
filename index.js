@@ -5,8 +5,10 @@ const scrap = require("./scraper");
 
 
 const init = async () => {
-  var server = new Hapi.Server(+process.env.PORT, '0.0.0.0');
-  
+  const server = Hapi.server({
+    port: process.env.PORT || 5000,
+    host: "localhost"
+  });
   server.route({
     method: "GET",
     path: "/posts",
@@ -26,7 +28,7 @@ const init = async () => {
 });
 
   await server.start();
-  console.log("Server running on %s", server.info.uri);
+  console.log("Server running on %s port %s", server.info.host ,server.info.port);
 };
 
 process.on("unhandledRejection", err => {
