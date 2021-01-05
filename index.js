@@ -1,20 +1,21 @@
 
 const Hapi = require("@hapi/hapi");
 
-const scrap = require("./scraper");
+const fs = require('fs');
 
 
 const init = async () => {
   const server = Hapi.server({
     port: process.env.PORT || 5000,
-    host: "0.0.0.0"
+    host: "localhost"
   });
+  await server.register(require('@hapi/inert'));
   server.route({
     method: "GET",
-    path: "/posts",
-    handler: async (request, h) => {
-      const result = await scrap();
-      return result;
+    path: "/posts.json",
+    handler:  (request, h) => {
+  
+      return h.file('posts.json');
       
     }
   });

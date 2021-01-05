@@ -1,6 +1,6 @@
 const cheerio = require("cheerio");
 const axios = require("axios").default;
-
+const fs = require('fs');
 const fethHtml = async url => {
   try {
     const { data } = await axios.get(url);
@@ -16,17 +16,26 @@ const extractPosts = selector => {
 	.find("td").find('b').text().trim();
 	
 	const description = selector 
-	.find("td").find('center').text().trim();
+	.find("td").find('center').text().replace(title,'').replace('(pièce jointe)','').trim();
 	
-	const author = selector 
-	.find("td").find('p').text().trim();
+	const authorAndDate = selector 
+	.find("td").find('p').text();
+
 	
 	const attachment = selector 
 	.find("td").find("a").prop('href');  
 	
 	const category = selector 
-	.prop('class');
-	
+	.prop('class').replace('affichage','').trim();
+	var author = authorAndDate.substring(
+		0, 
+		authorAndDate.lastIndexOf("(")
+	).trim();
+	var date = authorAndDate.substring(
+		authorAndDate.lastIndexOf("(") + 1, 
+		authorAndDate.lastIndexOf(")")
+	).replace('affiché le','').trim();
+
 	if(title == ''){
 		
 	}
@@ -37,6 +46,7 @@ const extractPosts = selector => {
 	author,
 	attachment,
 	category,
+	date
 	};}
 };
 
@@ -55,8 +65,26 @@ const scrap = async () => {
       return extractPosts(elementSelector);
     })
     .get();
-
-  return posts;
+	
+	return posts;
 };
+(async() => {
+	console.log('getting data from depinfoskikda.com')
+	const posts = await scrap() 
 
-module.exports = scrap;
+	var jsonData = {
+		"posts" : posts,
+	}
+ 
+	// stringify JSON Object
+	var jsonContent = JSON.stringify(jsonData);
+
+	fs.writeFile("posts.json", jsonContent, 'utf8', function (err) {
+		if (err) {
+			console.log("An error occured while writing JSON Object to File.");
+			return console.log(err);
+		}
+	 
+		console.log("data has been saved.");
+	});
+  })()
