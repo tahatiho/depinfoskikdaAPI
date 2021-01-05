@@ -7,7 +7,7 @@ const fs = require('fs');
 const init = async () => {
   const server = Hapi.server({
     port: process.env.PORT || 5000,
-    host: "localhost"
+    host: "0.0.0.0"
   });
   await server.register(require('@hapi/inert'));
   server.route({
